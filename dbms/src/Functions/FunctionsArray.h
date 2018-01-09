@@ -1540,6 +1540,49 @@ public:
     FunctionArrayPopBack() : FunctionArrayPop(false, name) {}
 };
 
+class FunctionArrayAllAny : public IFunction
+{
+public:
+    FunctionArrayAllAny(const Context & context, bool all, const char * name)
+            : context(context), all(all), name(name) {}
+
+    String getName() const override { return name; }
+
+    bool isVariadic() const override { return false; }
+    size_t getNumberOfArguments() const override { return 2; }
+
+    DataTypePtr getReturnTypeImpl(const DataTypes & arguments) const override;
+
+    void executeImpl(Block & block, const ColumnNumbers & arguments, size_t result) override;
+
+    bool useDefaultImplementationForConstants() const override { return true; }
+    bool useDefaultImplementationForNulls() const override { return false; }
+
+private:
+    const Context & context;
+    bool all;
+    const char * name;
+};
+
+class FunctionArrayAll : public FunctionArrayPop
+{
+public:
+    static constexpr auto name = "arrayAll";
+
+    static FunctionPtr create(const Context & context);
+
+    FunctionArrayAll() : FunctionArrayAllAny(true, name) {}
+};
+
+class FunctionArrayAny : public FunctionArrayPop
+{
+public:
+    static constexpr auto name = "arrayAny";
+
+    static FunctionPtr create(const Context & context);
+
+    FunctionArrayAny() : FunctionArrayAllAny(false, name) {}
+};
 
 struct NameHas { static constexpr auto name = "has"; };
 struct NameIndexOf { static constexpr auto name = "indexOf"; };

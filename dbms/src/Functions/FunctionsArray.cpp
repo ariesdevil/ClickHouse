@@ -2494,12 +2494,15 @@ String FunctionArrayConcat::getName() const
 DataTypePtr FunctionArrayConcat::getReturnTypeImpl(const DataTypes & arguments) const
 {
     if (arguments.empty())
-        throw Exception{"Function array requires at least one argument.", ErrorCodes::NUMBER_OF_ARGUMENTS_DOESNT_MATCH};
+        throw Exception{"Function " + getName() + " requires at least one argument.", ErrorCodes::NUMBER_OF_ARGUMENTS_DOESNT_MATCH};
 
-    auto array_type = typeid_cast<const DataTypeArray *>(arguments[0].get());
-    if (!array_type)
-        throw Exception("First argument for function " + getName() + " must be an array but it has type "
-            + arguments[0]->getName() + ".", ErrorCodes::ILLEGAL_TYPE_OF_ARGUMENT);
+    for (auto i : ext::range(0, arguments.size()))
+    {
+        auto array_type = typeid_cast<const DataTypeArray *>(arguments[i].get());
+        if (!array_type)
+            throw Exception("Argument " + std::to_string(i) + " for function " + getName() + " must be an array but it has type "
+                            + arguments[i]->getName() + ".", ErrorCodes::ILLEGAL_TYPE_OF_ARGUMENT);
+    }
 
     return getLeastCommonType(arguments);
 }
@@ -2835,6 +2838,86 @@ FunctionPtr FunctionArrayPopFront::create(const Context &)
 FunctionPtr FunctionArrayPopBack::create(const Context &)
 {
     return std::make_shared<FunctionArrayPopBack>();
+}
+
+
+/// Implementation of FunctionArrayAllAny.
+
+FunctionPtr FunctionArrayAll::create(const Context & context)
+{
+    return std::make_shared<FunctionArrayAll>(context);
+}
+
+FunctionPtr FunctionArrayAny::create(const Context & context)
+{
+    return std::make_shared<FunctionArrayAny>(context);
+}
+
+
+DataTypePtr FunctionArrayAllAny::getReturnTypeImpl(const DataTypes & arguments) const
+{
+    for (auto i : ext::range(0, arguments.size()))
+    {
+        auto array_type = typeid_cast<const DataTypeArray *>(arguments[i].get());
+        if (!array_type)
+            throw Exception("Argument " + std::to_string(i) + " for function " + getName() + " must be an array but it has type "
+                            + arguments[i]->getName() + ".", ErrorCodes::ILLEGAL_TYPE_OF_ARGUMENT);
+    }
+
+    return std::make_shared<DataTypeUInt8>();
+}
+
+void FunctionArrayAllAny::executeImpl(Block & block, const ColumnNumbers & arguments, size_t result)
+{
+    auto return_type = block.getByPosition(result).type;
+
+    if (return_type->onlyNull())
+    {
+        block.getByPosition(result).column = return_type->createColumnConstWithDefaultValue(block.rows());
+        return;
+    }
+
+    auto result_column = return_type->createColumn();
+
+    size_t rows = block.rows();
+    size_t num_args = arguments.size();
+
+    Columns preprocessed_columns(num_args);
+
+    for (size_t i = 0; i < num_args; ++i)
+    {
+        const ColumnWithTypeAndName & arg = block.getByPosition(arguments[i]);
+        ColumnPtr preprocessed_column = arg.column;
+
+        if (!arg.type->equals(*return_type))
+            preprocessed_column = castColumn(arg, return_type, context);
+
+        preprocessed_columns[i] = std::move(preprocessed_column);
+    }
+
+    std::vector<std::unique_ptr<IArraySource>> sources;
+
+    for (size_t i = 0; i < num_args; ++i)
+    {
+        bool is_const = false;
+        auto argument_column = block.getByPosition(arguments[i]).column;
+
+        if (auto argument_column_const = typeid_cast<const ColumnConst *>(argument_column.get()))
+        {
+            is_const = true;
+            argument_column = argument_column_const->getDataColumnPtr();
+        }
+
+        if (auto argument_column_array = typeid_cast<const ColumnArray *>(argument_column.get()))
+            sources.emplace_back(createArraySource(*argument_column_array, is_const, rows));
+        else
+            throw Exception{"Arguments for function " + getName() + " must be arrays.", ErrorCodes::LOGICAL_ERROR};
+    }
+
+    auto result_column_ptr = typeid_cast<ColumnUInt8 *>(result_column.get());
+    sliceHas(*sources[0], *sources[1], all, *result_column_ptr);
+
+    block.getByPosition(result).column = std::move(result_column);
 }
 
 }
