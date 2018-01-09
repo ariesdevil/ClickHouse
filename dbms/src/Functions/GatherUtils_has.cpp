@@ -7,8 +7,8 @@ namespace DB
 
 struct ArrayHasSelectArraySourcePair : public ArraySourcePairSelector<ArrayHasSelectArraySourcePair>
 {
-    template <typename Source, typename Sink>
-    static void selectSourcePair(Source && first, Source && second, bool all, ColumnUInt8 & result)
+    template <typename FirstSource, typename SecondSource>
+    static void selectSourcePair(FirstSource && first, SecondSource && second, bool all, ColumnUInt8 & result)
     {
         arrayAllAny<all>(first, second, result);
     }
