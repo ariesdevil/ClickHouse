@@ -1540,10 +1540,10 @@ public:
     FunctionArrayPopBack() : FunctionArrayPop(false, name) {}
 };
 
-class FunctionArrayAllAny : public IFunction
+class FunctionArrayHasAllAny : public IFunction
 {
 public:
-    FunctionArrayAllAny(bool all, const char * name) : all(all), name(name) {}
+    FunctionArrayHasAllAny(bool all, const char * name) : all(all), name(name) {}
 
     String getName() const override { return name; }
 
@@ -1562,24 +1562,24 @@ private:
     const char * name;
 };
 
-class FunctionArrayAll : public FunctionArrayAllAny
+class FunctionArrayHasAll : public FunctionArrayHasAllAny
 {
 public:
-    static constexpr auto name = "arrayAll";
+    static constexpr auto name = "hasAll";
 
     static FunctionPtr create(const Context &);
 
-    FunctionArrayAll() : FunctionArrayAllAny(true, name) {}
+    FunctionArrayHasAll() : FunctionArrayHasAllAny(true, name) {}
 };
 
-class FunctionArrayAny : public FunctionArrayAllAny
+class FunctionArrayHasAny : public FunctionArrayHasAllAny
 {
 public:
-    static constexpr auto name = "arrayAny";
+    static constexpr auto name = "hasAny";
 
     static FunctionPtr create(const Context &);
 
-    FunctionArrayAny() : FunctionArrayAllAny(false, name) {}
+    FunctionArrayHasAny() : FunctionArrayHasAllAny(false, name) {}
 };
 
 struct NameHas { static constexpr auto name = "has"; };

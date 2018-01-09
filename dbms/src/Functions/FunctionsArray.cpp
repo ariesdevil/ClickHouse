@@ -2843,18 +2843,18 @@ FunctionPtr FunctionArrayPopBack::create(const Context &)
 
 /// Implementation of FunctionArrayAllAny.
 
-FunctionPtr FunctionArrayAll::create(const Context &)
+FunctionPtr FunctionArrayHasAll::create(const Context &)
 {
-    return std::make_shared<FunctionArrayAll>();
+    return std::make_shared<FunctionArrayHasAll>();
 }
 
-FunctionPtr FunctionArrayAny::create(const Context &)
+FunctionPtr FunctionArrayHasAny::create(const Context &)
 {
-    return std::make_shared<FunctionArrayAny>();
+    return std::make_shared<FunctionArrayHasAny>();
 }
 
 
-DataTypePtr FunctionArrayAllAny::getReturnTypeImpl(const DataTypes & arguments) const
+DataTypePtr FunctionArrayHasAllAny::getReturnTypeImpl(const DataTypes & arguments) const
 {
     for (auto i : ext::range(0, arguments.size()))
     {
@@ -2867,7 +2867,7 @@ DataTypePtr FunctionArrayAllAny::getReturnTypeImpl(const DataTypes & arguments) 
     return std::make_shared<DataTypeUInt8>();
 }
 
-void FunctionArrayAllAny::executeImpl(Block & block, const ColumnNumbers & arguments, size_t result)
+void FunctionArrayHasAllAny::executeImpl(Block & block, const ColumnNumbers & arguments, size_t result)
 {
     auto return_type = block.getByPosition(result).type;
 
