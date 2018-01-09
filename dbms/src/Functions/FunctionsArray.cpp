@@ -2869,18 +2869,10 @@ DataTypePtr FunctionArrayHasAllAny::getReturnTypeImpl(const DataTypes & argument
 
 void FunctionArrayHasAllAny::executeImpl(Block & block, const ColumnNumbers & arguments, size_t result)
 {
-    auto return_type = block.getByPosition(result).type;
-
-    if (return_type->onlyNull())
-    {
-        block.getByPosition(result).column = return_type->createColumnConstWithDefaultValue(block.rows());
-        return;
-    }
-
     size_t rows = block.rows();
     size_t num_args = arguments.size();
 
-    auto result_column = return_type->createColumnConstWithDefaultValue(rows);
+    auto result_column = ColumnUInt8::create(rows);
 
     std::vector<std::unique_ptr<IArraySource>> sources;
 
