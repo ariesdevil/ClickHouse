@@ -10,7 +10,10 @@ struct ArrayHasSelectArraySourcePair : public ArraySourcePairSelector<ArrayHasSe
     template <typename FirstSource, typename SecondSource>
     static void selectSourcePair(FirstSource && first, SecondSource && second, bool all, ColumnUInt8 & result)
     {
-        arrayAllAny<all>(first, second, result);
+        if (all)
+            arrayAllAny<true>(first, second, result);
+        else
+            arrayAllAny<false>(first, second, result);
     }
 };
 
