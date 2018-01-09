@@ -1190,11 +1190,16 @@ bool sliceHasImpl(const FirstSliceType & first, const SecondSliceType & second,
     return all;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
 template <typename T, typename U>
 bool sliceEqualElements(const NumericArraySlice<T> & first, const NumericArraySlice<U> & second, size_t first_ind, size_t second_ind)
 {
     return first.data[first_ind] == second.data[second_ind];
 }
+
+#pragma GCC diagnostic pop
 
 template <typename T>
 bool sliceEqualElements(const NumericArraySlice<T> & first, const GenericArraySlice & second, size_t, size_t)
