@@ -115,7 +115,7 @@ struct ArraySourcePairSelector
     template <typename ... Args>
     static void select(IArraySource & first, IArraySource & second, Args && ... args)
     {
-        GetArraySinkSelector<Base>::select(first, second, args ...);
+        GetArraySourceSelector<Base>::select(first, second, args ...);
     }
 
     template <typename FirstSource, typename ... Args>
