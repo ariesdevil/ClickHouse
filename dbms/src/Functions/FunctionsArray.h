@@ -1543,8 +1543,7 @@ public:
 class FunctionArrayAllAny : public IFunction
 {
 public:
-    FunctionArrayAllAny(const Context & context, bool all, const char * name)
-            : context(context), all(all), name(name) {}
+    FunctionArrayAllAny(bool all, const char * name) : all(all), name(name) {}
 
     String getName() const override { return name; }
 
@@ -1559,7 +1558,6 @@ public:
     bool useDefaultImplementationForNulls() const override { return false; }
 
 private:
-    const Context & context;
     bool all;
     const char * name;
 };

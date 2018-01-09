@@ -2882,33 +2882,20 @@ void FunctionArrayAllAny::executeImpl(Block & block, const ColumnNumbers & argum
     size_t rows = block.rows();
     size_t num_args = arguments.size();
 
-    Columns preprocessed_columns(num_args);
-
-    for (size_t i = 0; i < num_args; ++i)
-    {
-        const ColumnWithTypeAndName & arg = block.getByPosition(arguments[i]);
-        ColumnPtr preprocessed_column = arg.column;
-
-        if (!arg.type->equals(*return_type))
-            preprocessed_column = castColumn(arg, return_type, context);
-
-        preprocessed_columns[i] = std::move(preprocessed_column);
-    }
-
     std::vector<std::unique_ptr<IArraySource>> sources;
 
     for (size_t i = 0; i < num_args; ++i)
     {
         bool is_const = false;
-        auto argument_column = block.getByPosition(arguments[i]).column;
+        auto argument_column = block.getByPosition(arguments[i]).column.get();
 
-        if (auto argument_column_const = typeid_cast<const ColumnConst *>(argument_column.get()))
+        if (auto argument_column_const = typeid_cast<const ColumnConst *>(argument_column))
         {
             is_const = true;
-            argument_column = argument_column_const->getDataColumnPtr();
+            argument_column = argument_column_const->getDataColumnPtr().get();
         }
 
-        if (auto argument_column_array = typeid_cast<const ColumnArray *>(argument_column.get()))
+        if (auto argument_column_array = typeid_cast<const ColumnArray *>(argument_column))
             sources.emplace_back(createArraySource(*argument_column_array, is_const, rows));
         else
             throw Exception{"Arguments for function " + getName() + " must be arrays.", ErrorCodes::LOGICAL_ERROR};
