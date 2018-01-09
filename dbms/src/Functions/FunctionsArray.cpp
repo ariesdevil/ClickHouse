@@ -2843,14 +2843,14 @@ FunctionPtr FunctionArrayPopBack::create(const Context &)
 
 /// Implementation of FunctionArrayAllAny.
 
-FunctionPtr FunctionArrayAll::create(const Context & context)
+FunctionPtr FunctionArrayAll::create(const Context &)
 {
-    return std::make_shared<FunctionArrayAll>(context);
+    return std::make_shared<FunctionArrayAll>();
 }
 
-FunctionPtr FunctionArrayAny::create(const Context & context)
+FunctionPtr FunctionArrayAny::create(const Context &)
 {
-    return std::make_shared<FunctionArrayAny>(context);
+    return std::make_shared<FunctionArrayAny>();
 }
 
 

@@ -1567,7 +1567,7 @@ class FunctionArrayAll : public FunctionArrayAllAny
 public:
     static constexpr auto name = "arrayAll";
 
-    static FunctionPtr create(const Context & context);
+    static FunctionPtr create(const Context &);
 
     FunctionArrayAll() : FunctionArrayAllAny(true, name) {}
 };
@@ -1577,7 +1577,7 @@ class FunctionArrayAny : public FunctionArrayAllAny
 public:
     static constexpr auto name = "arrayAny";
 
-    static FunctionPtr create(const Context & context);
+    static FunctionPtr create(const Context &);
 
     FunctionArrayAny() : FunctionArrayAllAny(false, name) {}
 };
