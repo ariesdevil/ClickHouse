@@ -1239,7 +1239,7 @@ bool sliceHas(const GenericArraySlice & /*first*/, const NumericArraySlice<U> & 
 }
 
 template <bool all, typename T>
-bool sliceHas(const NumericArraySlice<T> & /*first*/, GenericArraySlice & /*second*/)
+bool sliceHas(const NumericArraySlice<T> & /*first*/, const GenericArraySlice & /*second*/)
 {
     return false;
 }
