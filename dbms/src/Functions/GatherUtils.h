@@ -1161,8 +1161,8 @@ template <bool all, typename FirstSliceType, typename SecondSliceType,
 bool sliceHasImpl(const FirstSliceType & first, const SecondSliceType & second,
                   const UInt8 * first_null_map, const UInt8 * second_null_map)
 {
-    const bool has_first_null_map = first_null_map == nullptr;
-    const bool has_second_null_map = second_null_map == nullptr;
+    const bool has_first_null_map = first_null_map != nullptr;
+    const bool has_second_null_map = second_null_map != nullptr;
 
     for (size_t i = 0; i < second.size; ++i)
     {
