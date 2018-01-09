@@ -2877,10 +2877,10 @@ void FunctionArrayHasAllAny::executeImpl(Block & block, const ColumnNumbers & ar
         return;
     }
 
-    auto result_column = return_type->createColumn();
-
     size_t rows = block.rows();
     size_t num_args = arguments.size();
+
+    auto result_column = return_type->createColumnConstWithDefaultValue(rows);
 
     std::vector<std::unique_ptr<IArraySource>> sources;
 
