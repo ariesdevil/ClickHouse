@@ -1564,7 +1564,7 @@ private:
     const char * name;
 };
 
-class FunctionArrayAll : public FunctionArrayPop
+class FunctionArrayAll : public FunctionArrayAllAny
 {
 public:
     static constexpr auto name = "arrayAll";
@@ -1574,7 +1574,7 @@ public:
     FunctionArrayAll() : FunctionArrayAllAny(true, name) {}
 };
 
-class FunctionArrayAny : public FunctionArrayPop
+class FunctionArrayAny : public FunctionArrayAllAny
 {
 public:
     static constexpr auto name = "arrayAny";
